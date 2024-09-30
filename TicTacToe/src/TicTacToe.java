@@ -5,104 +5,107 @@
  * Date: 23.09.2024
  * Description: This class creates a window for playing Tic Tac Toe. I'm developing this to improve my coding 
  * skills and refresh my knowledge of Java, as I have primarily used Python in the past.
- * Version: 1.0
+ * Version: 1.0, source: https://www.youtube.com/watch?v=rA7tfvpkw0I, simple version of tic-tac-toe
  */
 
-// Importing core AWT (Abstract Window Toolkit) classes for building graphical user interfaces (GUI)
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;      
-
+ import java.awt.*;         // Abstract Window Toolkit packag, includes components for building graphical user interfaces (GUIs) such as buttons, text fields, etc.
+import java.awt.event.*;    // to handling events (like mouse clicks, keyboard input, etc.) and it's needed for adding interactivity to GUI components
+import java.util.*;         // includes data structures like ArrayList, HashMap, Date, etc.
+import javax.swing.*;       // Swing is used to create more modern and flexible GUIs compared to AWT and It provides components like JFrame, JButton, JPanel, and more.
 
 public class TicTacToe implements ActionListener { // TicTacToe class handles user interactions via ActionListener.
 
     Random random = new Random(); // decide who is going to start
-    JFrame frame = new JFrame();
-    JPanel title_panel = new JPanel();
-    JPanel button_panel = new JPanel();
-    JLabel textfield = new JLabel();
+    JFrame frame = new JFrame("Tic-Tac-Toe"); // create the frame for the game with a title
+    JPanel title_panel = new JPanel(); // a panel at the top of the window to show a text
+    JPanel button_panel = new JPanel(); // the game board itself
+    JLabel textfield = new JLabel(); // the textfield which will be shown in the title_panel
     JButton[] buttons = new JButton[9]; // 9 Buttons for playing
     boolean player1_turn; // True => Player 1's turn, False => Player 2's turn
+    int turns = 0; // check for a tie
 
     TicTacToe(){ // constructer
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 800);
-        frame.getContentPane().setBackground(new Color(50, 50, 50));
-        frame.setLayout(new BorderLayout());
-        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // closes the window when it's exited
+        frame.setSize(800, 800); // set the size of the frame
+        frame.getContentPane().setBackground(new Color(50, 50, 50)); // set backgroundcolor of the frame
+        frame.setLayout(new BorderLayout()); // https://docs.oracle.com/javase/tutorial/uiswing/layout/border.html
+        frame.setVisible(true); // make the frame visible
+        frame.setLocationRelativeTo(null); // put the frame in the center of the screen
 
-        textfield.setBackground(new Color(25, 25, 25));
-        textfield.setForeground(new Color(25, 255, 0));
-        textfield.setFont(new Font("Ink Free", Font.BOLD, 50));
-        textfield.setHorizontalAlignment(JLabel.CENTER);
-        textfield.setText("Tic-Tac-Toe");
-        textfield.setOpaque(true);
+        textfield.setBackground(new Color(25, 25, 25)); // set backgroundcolor of the textfield
+        textfield.setForeground(new Color(25, 255, 0)); // set color of the text
+        textfield.setFont(new Font("Ink Free", Font.BOLD, 50)); // set style of font, size and make it bold
+        textfield.setHorizontalAlignment(JLabel.CENTER); // put the text into the center of the label
+        textfield.setText("Tic-Tac-Toe"); // original text for this label
+        textfield.setOpaque(true); // use the backgroundcolor of this label for the titel panel
 
-        title_panel.setLayout(new BorderLayout());
-        title_panel.setBounds(0, 0, 800, 200);
+        title_panel.setLayout(new BorderLayout());// https://docs.oracle.com/javase/tutorial/uiswing/layout/border.html
+        title_panel.setBounds(0, 0, 800, 200); // x and y are the coordination of the upper left corner of the panel
 
-        button_panel.setLayout(new GridLayout(3, 3));
-        button_panel.setBackground(new Color(150, 150, 150)); // just to check if it works
+        button_panel.setLayout(new GridLayout(3, 3)); // https://docs.oracle.com/javase/tutorial/uiswing/layout/grid.html
+        button_panel.setBackground(new Color(150, 150, 150)); // used just to check if it works, sets backgroundcolor of the panel
 
-        for(int i=0; i<9; i++) {
-            buttons[i] = new JButton();
-            button_panel.add(buttons[i]);
-            buttons[i].setFont(new Font("MV Boli", Font.BOLD, 120));
-            buttons[i].setFocusable(false);
-            buttons[i].addActionListener(this);
+        for(int i=0; i<9; i++) { // for loop, iterates 9 times from 0 to 8
+            buttons[i] = new JButton(); // create a button
+            button_panel.add(buttons[i]); // add button to panel
+            buttons[i].setFont(new Font("MV Boli", Font.BOLD, 120)); //set style of font, size and make it bold
+            buttons[i].setFocusable(false); // access with keyboard is denied
+            buttons[i].addActionListener(this); // this is for the current object and activates to interact with a klick
         }
 
+        // put everything togethere at the correct place
         title_panel.add(textfield);
         frame.add(title_panel, BorderLayout.NORTH);
         frame.add(button_panel);
 
-        firstTurn();
+        firstTurn(); // activate function to desice whose move it is
     }
 
     public void actionPerformed(ActionEvent e) { // Handles an action event, such as a button click (no return value).
-
-        for (int i = 0; i < 9; i++) {
-            if (e.getSource() == buttons[i]) {
-                if (player1_turn) {
+        /**
+         * Function is activated by clicking on a button and will change the button as the players turn is
+         */
+        for (int i = 0; i < 9; i++) { // loops through all buttons
+            if (e.getSource() == buttons[i]) { // check each button for the activation click
+                turns++;
+                if (player1_turn) { // change is depending on whose turn it is
                     if (buttons[i].getText().equals("")) { // if empty
                         buttons[i].setForeground(new Color(255, 0, 0)); // Corrected Color constructor
-                        buttons[i].setText("X");
-                        player1_turn = false;
-                        textfield.setText("O Turn");
-                        check();
+                        buttons[i].setText("X"); // text in this button
+                        player1_turn = false; // player 2 will continue
+                        textfield.setText("O Turn"); // chance text in title panel
+                        check(); // check if there's already a winner
                     }
-                } else {
+                } else { // change is depending on whose turn it is
                     if (buttons[i].getText().equals("")) { // if empty
                         buttons[i].setForeground(new Color(0, 0, 255)); // Corrected Color constructor
-                        buttons[i].setText("O");
-                        player1_turn = true;
-                        textfield.setText("X Turn");
-                        check();
+                        buttons[i].setText("O"); // text in this button
+                        player1_turn = true; // player 1 will continue
+                        textfield.setText("X Turn"); // chance text in title panel
+                        check(); // check if there's already a winner
                     }
                 }
             }
         }
     }
     
-
-    public void firstTurn() {
+    public void firstTurn() { // function to decide randomly who will beginn
 
         try {
-            Thread.sleep(2000);   
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.sleep(2000); // wait for 2 sec so that the title Tic-Tac-Toe is readable
+        } catch (InterruptedException e) { // catches the exception
+            e.printStackTrace(); // prints the error message for this interruption in the console
         }
 
 
-        if(random.nextInt(2)==0){ // 0 => Player 1s turn, 1 => Player 2s turn
-            player1_turn = true;
-            textfield.setText("X turn");
+        if(random.nextInt(2)==0){ // 0 => Player ones turn, 1 => Player twos turn
+            player1_turn = true; // player ones turn
+            textfield.setText("X turn"); // change title panel
         }
         else {
-            player1_turn = false;
-            textfield.setText("O Turn");
+            player1_turn = false; // player twos turn
+            textfield.setText("O Turn"); // change title panel
         }
 
     }
@@ -229,6 +232,13 @@ public class TicTacToe implements ActionListener { // TicTacToe class handles us
             ) {
                 oWins(2, 4, 6);
             }
+        if (turns == 9) { // after 9 klicks and no winner is found, we have a tie
+            for(int i=0; i < 9; i++){
+                buttons[i].setBackground(Color.ORANGE); // change the buttons
+                textfield.setText("Tie"); // no winner found and change title
+
+            }
+        }
     }
     
     /**
